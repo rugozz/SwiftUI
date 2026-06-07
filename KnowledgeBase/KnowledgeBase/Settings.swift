@@ -5,6 +5,9 @@
 //  Created by Лисин Никита on 17.02.2026.
 //
 
+
+
+
 import SwiftUI
 
 struct SettingsView: View {
@@ -15,39 +18,80 @@ struct SettingsView: View {
     @State private var username = "User"
     @State private var selectedColorScheme = 0
     
+    // Binding переменная для связи с ContentView
+    @Binding var titleOn: Bool
+    
+    // Переменная окружения для отслеживания цветовой схемы
+    @Environment(\.colorScheme) var colorScheme
+    
     // Опции для Picker
     let fontSizeOptions = ["Small", "Medium", "Large"]
     let colorSchemeOptions = ["Light", "Dark", "System"]
     
+    // Вычисляемое свойство для текста цветовой схемы
+    var colorSchemeText: String {
+        colorScheme == .light ? "☀️ Light Theme enabled" : "🌙 Dark Theme enabled"
+    }
+    
     var body: some View {
         NavigationView {
             Form {
-                // Секция профиля
+                // Секция с информацией о цветовой схеме
                 Section {
                     HStack {
-                        Image(systemName: "person.circle.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(.blue)
+                        Image(systemName: colorScheme == .light ? "sun.max.fill" : "moon.fill")
+                            .foregroundColor(colorScheme == .light ? .orange : .purple)
+                            .font(.title2)
                         
-                        VStack(alignment: .leading) {
-                            Text(username)
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            Text("Member since 2024")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.leading, 8)
+                        Text(colorSchemeText)
+                            .font(.body)
+                            .fontWeight(.medium)
+                        
+                        Spacer()
+                        
+                        Circle()
+                            .fill(colorScheme == .light ? Color.orange : Color.purple)
+                            .frame(width: 8, height: 8)
+                            .opacity(0.7)
                     }
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
                 } header: {
-                    Text("Profile")
+                    Text("Current Theme")
                 } footer: {
-                    Text("Your personal information")
+                    Text("Theme changes automatically based on system settings")
                 }
                 
                 // Секция настроек отображения
                 Section {
+                    // Переключатель для управления заголовком InfoView
+                    Toggle(isOn: $titleOn) {
+                        Label {
+                            Text("Show Navigation Title")
+                                .font(.body)
+                        } icon: {
+                            Image(systemName: "textformat.header")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    
+                    // Условный текст, отображаемый при включенном переключателе
+                    if titleOn {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                                .font(.caption)
+                            Text("Navigation title enabled")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                            Spacer()
+                        }
+                        .padding(.top, 4)
+                        .transition(.opacity.combined(with: .slide))
+                    }
+                    
+                    Divider()
+                        .padding(.vertical, 8)
+                    
                     Picker("Font Size", selection: $selectedFontSize) {
                         ForEach(0..<fontSizeOptions.count, id: \.self) { index in
                             Text(fontSizeOptions[index])
@@ -69,7 +113,31 @@ struct SettingsView: View {
                 } header: {
                     Text("Display Settings")
                 } footer: {
-                    Text("Customize how the app looks")
+                    Text("Customize how the app looks. Navigation title setting is saved automatically.")
+                }
+                
+                // Секция профиля (остальная часть без изменений)
+                Section {
+                    HStack {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(.blue)
+                        
+                        VStack(alignment: .leading) {
+                            Text(username)
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            Text("Member since 2024")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.leading, 8)
+                    }
+                    .padding(.vertical, 8)
+                } header: {
+                    Text("Profile")
+                } footer: {
+                    Text("Your personal information")
                 }
                 
                 // Секция уведомлений
@@ -155,10 +223,11 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+            .animation(.easeInOut, value: titleOn)
         }
     }
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(titleOn: .constant(true))
 }
