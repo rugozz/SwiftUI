@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InfoView: View {
     let posts = samplePosts
+    let titleOn: Bool // Свойство для управления заголовком
     
     var body: some View {
         NavigationView {
@@ -17,13 +18,26 @@ struct InfoView: View {
                     InfoRow(post: post)
                 }
             }
-            .navigationTitle("Knowledge Base")
+            .navigationTitle(titleOn ? "Knowledge Base" : "")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                //Индикатор состояния
+                if !titleOn {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Text("Title hidden")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
             .listStyle(.plain)
         }
     }
 }
 
 #Preview {
-    InfoView()
+    InfoView(titleOn: true)
+}
+#Preview("Without Title") {
+    InfoView(titleOn: false)
 }
