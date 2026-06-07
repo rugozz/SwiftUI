@@ -6,29 +6,28 @@
 //
 
 
+// ContentView.swift
 import SwiftUI
 
 struct ContentView: View {
-    // @AppStorage сохраняет значение в UserDefaults
-    // Ключ "navigationTitleEnabled" используется для сохранения/загрузки
-    // Значение по умолчанию: true
     @AppStorage("navigationTitleEnabled") private var titleOn: Bool = true
+    @State private var posts = samplePosts
     
     var body: some View {
         TabView {
-            // Первая вкладка - База знаний
-            InfoView(titleOn: titleOn)
+            InfoView(posts: posts, titleOn: titleOn)
                 .tabItem {
                     Label("Knowledge", systemImage: "book.fill")
                 }
             
-            // Вторая вкладка - Hello
-            HellowView()
-                .tabItem {
-                    Label("Hello", systemImage: "hand.wave.fill")
-                }
+            QuizView { newPost in
+                // Добавляем новый пост в базу знаний
+                posts.append(newPost)
+            }
+            .tabItem {
+                Label("Quiz", systemImage: "brain.head.profile")
+            }
             
-            // Третья вкладка - Настройки
             SettingsView(titleOn: $titleOn)
                 .tabItem {
                     Label("Settings", systemImage: "gear")

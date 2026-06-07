@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct InfoView: View {
-    let posts = samplePosts
-    let titleOn: Bool // Свойство для управления заголовком
+    let posts: [Post]
+    let titleOn: Bool
     
     var body: some View {
         NavigationView {
@@ -21,7 +21,6 @@ struct InfoView: View {
             .navigationTitle(titleOn ? "Knowledge Base" : "")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                //Индикатор состояния
                 if !titleOn {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Text("Title hidden")
@@ -30,14 +29,20 @@ struct InfoView: View {
                     }
                 }
             }
+            .overlay {
+                if posts.isEmpty {
+                    ContentUnavailableView(
+                        "No Knowledge Yet",
+                        systemImage: "book.closed",
+                        description: Text("Complete quizzes to add knowledge!")
+                    )
+                }
+            }
             .listStyle(.plain)
         }
     }
 }
 
 #Preview {
-    InfoView(titleOn: true)
-}
-#Preview("Without Title") {
-    InfoView(titleOn: false)
+    InfoView(posts: samplePosts, titleOn: true)
 }
